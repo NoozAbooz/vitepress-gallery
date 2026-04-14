@@ -36,9 +36,9 @@
 
       <div class="all-images-hidden" aria-hidden="true">
         <img
-          v-for="(src, i) in props.images"
+          v-for="(img, i) in parsedImages"
           :key="'hidden-' + i"
-          :src="src"
+          :src="img.src"
           :alt="props.captions?.[i] || ''"
           loading="eager"
           draggable="false"
@@ -52,9 +52,10 @@
       <div class="image-wrapper">
         <transition :name="direction" mode="out-in">
           <img
-            :src="props.images[currentIndex]"
+            :src="currentImage.src"
             :alt="altText"
-            :key="props.images[currentIndex]"
+            :key="currentImage.key"
+            :style="currentImageStyle"
           />
         </transition>
       </div>
@@ -71,11 +72,56 @@ interface Props {
   captions?: string[]
 }
 
+interface ParsedImage {
+  src: string
+  width?: number
+  height?: number
+  key: string
+}
+
 const props = defineProps<Props>()
 const currentIndex = ref(0)
 const direction = ref('fade')
 const isMobile = ref(false)
 let touchStartX = 0
+
+function parseImageEntry(entry: string, index: number): ParsedImage {
+  const raw = entry.trim()
+  const sizeMatch = raw.match(/\s*=\s*(\d+)\s*[xX]\s*(\d+)\s*$/)
+
+  if (!sizeMatch) {
+    return {
+      src: raw,
+      key: `${raw}-${index}`
+    }
+  }
+
+  const width = Number(sizeMatch[1])
+  const height = Number(sizeMatch[2])
+  const src = raw.slice(0, sizeMatch.index).trim()
+
+  return {
+    src,
+    width,
+    height,
+    key: `${src}-${width}x${height}-${index}`
+  }
+}
+
+const parsedImages = computed(() => props.images.map((img, index) => parseImageEntry(img, index)))
+
+const currentImage = computed<ParsedImage>(() => {
+  const fallback: ParsedImage = { src: '', key: 'empty' }
+  return parsedImages.value[currentIndex.value] ?? fallback
+})
+
+const currentImageStyle = computed(() => {
+  const img = currentImage.value
+  const style: Record<string, string> = {}
+  if (img.width) style.width = `${img.width}px`
+  if (img.height) style.height = `${img.height}px`
+  return style
+})
 
 function checkMobile() {
   isMobile.value = window.innerWidth <= 960
@@ -131,7 +177,7 @@ const surroundingImages = computed(() => {
 
   for (let i = -backCount; i <= forwardCount; i++) {
     const idx = currentIndex.value + i
-    if (idx >= 0 && idx < props.images.length) result.push(props.images[idx])
+    if (idx >= 0 && idx < parsedImages.value.length) result.push(parsedImages.value[idx].src)
   }
 
   return result

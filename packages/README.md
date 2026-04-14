@@ -53,6 +53,31 @@ export default {
 />
 ```
 
+### Optional Per-Image Size
+
+By default, each image behaves exactly like before.
+
+To set a custom rendered size for a specific image, append `=WIDTHxHEIGHT` to that image string:
+
+```vue
+<Gallery 
+  :images="[
+    'demo-1.png =300x500',
+    'demo-2.jpg',
+    'demo-3.jpg',
+    'demo-4.jpg'
+  ]" 
+  :captions="[
+    'Image caption Nr.1 ...',
+    'Image caption Nr.2 ...',
+    'Image caption Nr.3 ...',
+    'Image caption Nr.4 ...'
+  ]"
+/>
+```
+
+In this example, only the first image is rendered at `300x500px`. Others remain unaffected.
+
 > Captions are optional.
 
 > Alt text by default if captions are not specified - Image 1, Image 2, Image ... etc. If captions are specified, then alt = captions
