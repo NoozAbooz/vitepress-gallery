@@ -1,11 +1,44 @@
-/// <reference types="C:/Users/user1/Desktop/vitepress-gallery/packages/node_modules/@vue/language-core/types/template-helpers.d.ts" />
-/// <reference types="C:/Users/user1/Desktop/vitepress-gallery/packages/node_modules/@vue/language-core/types/props-fallback.d.ts" />
+/// <reference types="C:/Users/Michael/Documents/GitHub/vitepress-gallery/packages/node_modules/@vue/language-core/types/template-helpers.d.ts" />
+/// <reference types="C:/Users/Michael/Documents/GitHub/vitepress-gallery/packages/node_modules/@vue/language-core/types/props-fallback.d.ts" />
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 const props = defineProps();
 const currentIndex = ref(0);
 const direction = ref('fade');
 const isMobile = ref(false);
 let touchStartX = 0;
+function parseImageEntry(entry, index) {
+    const raw = entry.trim();
+    const sizeMatch = raw.match(/\s*=\s*(\d+)\s*[xX]\s*(\d+)\s*$/);
+    if (!sizeMatch) {
+        return {
+            src: raw,
+            key: `${raw}-${index}`
+        };
+    }
+    const width = Number(sizeMatch[1]);
+    const height = Number(sizeMatch[2]);
+    const src = raw.slice(0, sizeMatch.index).trim();
+    return {
+        src,
+        width,
+        height,
+        key: `${src}-${width}x${height}-${index}`
+    };
+}
+const parsedImages = computed(() => props.images.map((img, index) => parseImageEntry(img, index)));
+const currentImage = computed(() => {
+    const fallback = { src: '', key: 'empty' };
+    return parsedImages.value[currentIndex.value] ?? fallback;
+});
+const currentImageStyle = computed(() => {
+    const img = currentImage.value;
+    const style = {};
+    if (img.width)
+        style.width = `${img.width}px`;
+    if (img.height)
+        style.height = `${img.height}px`;
+    return style;
+});
 function checkMobile() {
     isMobile.value = window.innerWidth <= 960;
 }
@@ -54,8 +87,8 @@ const surroundingImages = computed(() => {
     const forwardCount = isMobile.value ? 2 : 2;
     for (let i = -backCount; i <= forwardCount; i++) {
         const idx = currentIndex.value + i;
-        if (idx >= 0 && idx < props.images.length)
-            result.push(props.images[idx]);
+        if (idx >= 0 && idx < parsedImages.value.length)
+            result.push(parsedImages.value[idx].src);
     }
     return result;
 });
@@ -184,16 +217,16 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
     'aria-hidden': "true",
 });
 /** @type {__VLS_StyleScopedClasses['all-images-hidden']} */ ;
-for (const [src, i] of __VLS_vFor((props.images))) {
+for (const [img, i] of __VLS_vFor((__VLS_ctx.parsedImages))) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.img)({
         key: ('hidden-' + i),
-        src: (src),
+        src: (img.src),
         alt: (props.captions?.[i] || ''),
         loading: "eager",
         draggable: "false",
     });
     // @ts-ignore
-    [];
+    [parsedImages,];
 }
 if (props.captions?.[__VLS_ctx.currentIndex]) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
@@ -220,12 +253,13 @@ const __VLS_2 = __VLS_1({
 }, ...__VLS_functionalComponentArgsRest(__VLS_1));
 const { default: __VLS_5 } = __VLS_3.slots;
 __VLS_asFunctionalElement1(__VLS_intrinsics.img)({
-    src: (props.images[__VLS_ctx.currentIndex]),
+    src: (__VLS_ctx.currentImage.src),
     alt: (__VLS_ctx.altText),
-    key: (props.images[__VLS_ctx.currentIndex]),
+    key: (__VLS_ctx.currentImage.key),
+    ...{ style: (__VLS_ctx.currentImageStyle) },
 });
 // @ts-ignore
-[currentIndex, currentIndex, currentIndex, currentIndex, direction, altText,];
+[currentIndex, currentIndex, direction, currentImage, currentImage, altText, currentImageStyle,];
 var __VLS_3;
 // @ts-ignore
 [];

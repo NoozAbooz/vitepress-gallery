@@ -1,10 +1,10 @@
 {
-  "name": "@miletorix/vitepress-gallery",
-  "version": "1.0.0",
+  "name": "@nooz/vitepress-gallery",
+  "version": "1.0.1",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/miletorix/vitepress-gallery"
+    "url": "https://github.com/NoozAbooz/vitepress-gallery"
   },
   "description": "A responsive, swipeable image gallery component for VitePress with thumbnails, navigation, captions, and smooth transitions.",
   "main": "./dist/gallery.umd.js",
@@ -50,7 +50,7 @@
     "vue-lightbox",
     "vue-slider"
   ],
-  "author": "miletorix",
+  "author": "nooz",
   "license": "MIT",
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.0",
@@ -58,6 +58,6 @@
     "typescript": "^5.0.0",
     "vite": "^7.0.0",
     "vitepress": "^1.6.3",
-    "vue-tsc": "^3.0.0"
+    "vue-tsc": "^3.2.6"
   }
 }
